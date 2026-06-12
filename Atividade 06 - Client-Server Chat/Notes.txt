@@ -1,0 +1,25 @@
+# QUESTIONÁRIO:
+
+FORMA DUPLA
+Crie um sistema de chat cliente-servidor com múltiplos clientes com a Linguagem de programação Python utilizando Socket e Thread.
+
+O programa deve ter um servidor que permita que vários clientes se conectem e conversem entre si.
+Quando o cliente se conecta, o nome do cliente já é enviado ao servidor.
+Quando o usuário qualquer enviar uma mensagem para o servidor, a mensagem deve ser retransmitida para todos os clientes conectados ao servidor.
+A mensagem deverá ser alterada pelo servidor antes de enviar para os outros clientes adicionado antes da mensagem o nome do cliente que enviou a mensagem.
+
+Ex. celso: oi
+
+Entregar o relatório e o código por aqui sem estar compactado
+
+
+---
+
+
+Dupla:
+- Vinícius Pereira dos Santos
+
+Peço perdão, professor. Eu não consegui formar uma dupla.
+Abaixo está o link do meu github, na qual estarei colocando o código da atividade, caso tenha interesse em vê-lo lá.
+
+https://github.com/normanwhittlecliff
