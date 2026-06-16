@@ -58,8 +58,8 @@ For this one, I know I was supposed to, say, update the previous code, but I fel
 
 ### TODO
 
-[X] Add commands
-[X] Add "Error, Usuário já conectado" if entering a user with an existing name.
+[ ] Add commands
+[ ] Add "Error, Usuário já conectado" if entering a user with an existing name.
 
 [ ] Add command "/listarusuarios" that returns a list with every user 
 [ ] Add command "/criargrupo [nome]" that creates a group with a given name and adds the creator to the group,
@@ -75,3 +75,10 @@ For this one, I know I was supposed to, say, update the previous code, but I fel
 [ ] Add command "/msg USERNAME [MENSAGEM]" sends a message only to the user USERNAME; 
 [ ] Add command "/msg GROUP [MENSAGEM]" sends a message only to the group GROUP; 
 [ ] Add command "/msgt [LETTER] [MENSAGEM]" and the letter can be "C" (mensagem para todos os usuário online), "D" (mensagem para todos os usuário desconectados), "T" (todos os usuários)
+
+
+
+
+
+color 2 & cd OneDrive\Documents\College Subjects\2026.1 Projeto de Sistemas Distribuidos (PSD)\Atividade 07 - Projeto de Chat Distribuido\src & python "server.py"
+color 3 & cd OneDrive\Documents\College Subjects\2026.1 Projeto de Sistemas Distribuidos (PSD)\Atividade 07 - Projeto de Chat Distribuido\src & python "client.py"

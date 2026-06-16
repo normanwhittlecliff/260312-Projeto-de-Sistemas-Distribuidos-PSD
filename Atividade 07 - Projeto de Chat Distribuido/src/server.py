@@ -87,7 +87,7 @@ def receiveConnections():
         clients.append(client)
         names.append(name)
 
-        print(f"{name} connected from {address}")
+        print(f"SERVER: {name} connected from {address}")
 
         broadcast(f"SERVER: {name} joined the chat.")
 
