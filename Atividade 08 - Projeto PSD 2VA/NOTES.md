@@ -46,7 +46,9 @@ Os anexos de 05 ao 11 s'ao arquivos de texto com números. Estes arquivos serão
 
 ## Norman's Notes
 
-### TODO (RELATÓRIO)
+### TO-DO
+
+### TO-DO (RELATÓRIO)
 
 - [ ] Descrição do programa.
 - [ ] Gráfico comparando o tempo das diferentes variações do programa.
