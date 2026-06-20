@@ -8,31 +8,85 @@ import sys
 import time
 
 # ==========
+# CONSTANTS
+
+DEFAULT_PORT = 5000
+
+# ==========
 # USABLE FUNCTIONS
 
 def exitIfNone(object):
     if object is None or object == "":
         sys.exit(0)
 
+# ==========
+# P1-P5 FUNCTIONS
 
 def workerProcess(matrixA, matrixB, start, end, queue):
     partial = multiplyRows(matrixA, matrixB, start, end)
     return queue.put((start, partial))
 
-# ==========
-# P1-P5 FUNCTIONS
+def runParallel(matrixA, matrixB, numberOfProcesses):
+    queue = multiprocessing.Queue()
+    processes = []
+    rows = getRowLength(matrixA)
+    chunk = rows // numberOfProcesses  # How many times we be dividing the work of multiplying the matrices
+    queue = multiprocessing.Queue()
+    # ----------
+    for workerIndex in range(numberOfProcesses):
+        startRow = workerIndex * chunk
+         # ----------
+        if workerIndex == numberOfProcesses - 1:
+            endRow = getRowLength(matrixA)
+        else:
+            endRow = startRow + chunk
+         # ----------
+        process = multiprocessing.Process(target=workerProcess, args=(matrixA, matrixB, startRow, endRow, queue))
+        processes.append(process)
+        process.start()
+
+        for p in processes:
+            p.join()
+     # ----------
+    matrixResult = [None] * getRowLength(matrixA)
+    for workerIndex in range(numberOfProcesses):
+        startRow, partial = queue.get()
+
+        for index, row in enumerate(partial):
+            matrixResult[startRow + index] = row
+     # ----------
+    return matrixResult
 
 def P1(matrixA, matrixB):
     startTime = time.time()         # TIME STARTED
-    matrixResult = multiplyRows(matrixA, matrixB, 0, len(matrixA))
+    matrix = multiplyRows(matrixA, matrixB, 0, len(matrixA))
     endTime = time.time()           # TIME FINISHED
     result = {
-        "matrix" : matrixResult,
+        "matrix" : matrix,
         "startTime" : startTime,
         "endTime" : endTime,
         "processingTime" : endTime - startTime
     }
     return result
+
+def P2(matrixA, matrixB):
+    workers = os.cpu_count()
+    startTime = time.time()         # TIME STARTED
+
+    matrix = runParallel(
+        matrixA,
+        matrixB,
+        workers
+    )
+
+    endTime = time.time()         # TIME ENDED
+
+    return {
+        "matrix" : matrix,
+        "startTime" : startTime,
+        "endTime" : endTime,
+        "processingTime" : endTime - startTime
+    }
 
 # ==========
 
@@ -70,10 +124,9 @@ def main():
         print("-" * 50)
 
     #variation = gui.showSelectOptions(["P1", "P2", "P3", "P4", "P5"], title="Selecione", message="Selecione a Variação desejada:")
-    variation = "P1"
+    variation = "P2" # =================================
 
     cores = os.cpu_count()
-    workers = 0
     remoteComputers=0
 
     # ==========
@@ -82,40 +135,14 @@ def main():
     if variation == "P1":
         matrixResult = P1(matrixA, matrixB)
     # ----------
-    elif variation in "P2P3P4":
+    elif  variation == "P2":
+        matrixResult = P2(matrixA, matrixB)
+    elif variation in "P2P3P4" and False:
         workers = cores
         if variation == "P3": workers = cores * 2
         if variation == "P4": workers = max(1, cores // 2)
         
-        chunk = getRowLength(matrixA) // workers  # How many times we be dividing the work of multiplying the matrices
-        processes = []
-        queue = multiprocessing.Queue()
-        # ----------
-        startTime = time.time()         # TIME STARTED
-
-        for worker in range(workers):
-            startRow = worker * chunk
-
-            if worker == workers - 1:
-                endRow = getRowLength(matrixA)
-            else:
-                endRow = startRow + chunk
-            
-            
-            process = multiprocessing.Process(target=workerProcess, args=(matrixA, matrixB, startRow, endRow, queue))
-            processes.append(process)
-            process.start()
-
-            for p in processes:
-                p.join()
         
-        matrixResult = [None] * getRowLength(matrixA)
-
-        for worker in range(workers):
-            startRow, partial = queue.get()
-
-            for index, row in enumerate(partial):
-                matrixResult[startRow + index] = row
         endTime = time.time()           # TIME FINISHED
     # ----------
             
@@ -143,4 +170,5 @@ def main():
     print("FILE SAVED!")
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     main()
