@@ -66,6 +66,7 @@ def multiplyRows(matrixA, matrixB, startRow, endRow):
 
             for k in range(len(matrixB)):
                 value += matrixA[i][k] * matrixB[k][j]
+                #print(value)
 
             rowResult.append(value)
         result.append(rowResult)

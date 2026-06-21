@@ -3,6 +3,7 @@ from common.matrixUtils import *
 from common import simpleGUI as gui
 from datetime import datetime
 import multiprocessing
+from multiprocessing import Manager
 import os
 import sys
 import time
@@ -24,14 +25,15 @@ def exitIfNone(object):
 
 def workerProcess(matrixA, matrixB, start, end, queue):
     partial = multiplyRows(matrixA, matrixB, start, end)
+    #print(partial)
     return queue.put((start, partial))
 
 def runParallel(matrixA, matrixB, numberOfProcesses):
-    queue = multiprocessing.Queue()
+    manager = Manager()
+    queue = manager.Queue()
     processes = []
     rows = getRowLength(matrixA)
     chunk = rows // numberOfProcesses  # How many times we be dividing the work of multiplying the matrices
-    queue = multiprocessing.Queue()
     # ----------
     for workerIndex in range(numberOfProcesses):
         startRow = workerIndex * chunk
@@ -45,8 +47,8 @@ def runParallel(matrixA, matrixB, numberOfProcesses):
         processes.append(process)
         process.start()
 
-        for p in processes:
-            p.join()
+    for p in processes:
+        p.join()
      # ----------
     matrixResult = [None] * getRowLength(matrixA)
     for workerIndex in range(numberOfProcesses):
@@ -102,9 +104,12 @@ def main():
         #matrixA = gui.openFile(title="Selecione a Matriz A", fileTypes=[("Text Files", "*.txt")], initialPath=inputDefaultPath, ); exitIfNone(matrixA)
         #matrixB = gui.openFile(title="Selecione a Matriz B", fileTypes=[("Text Files", "*.txt")]); exitIfNone(matrixA)
 
-        #matrixA = inputDefaultPath + "4_int.txt"
+        matrixA = inputDefaultPath + "4_int.txt"
         matrixA = inputDefaultPath + "10_int.txt"
         #matrixA = inputDefaultPath + "10_float.txt"
+        matrixA = inputDefaultPath + "128.txt"
+        matrixA = inputDefaultPath + "512.txt"
+        matrixA = inputDefaultPath + "1024.txt"
 
     matrixA = readMatrix(matrixA)
     matrixB = matrixA

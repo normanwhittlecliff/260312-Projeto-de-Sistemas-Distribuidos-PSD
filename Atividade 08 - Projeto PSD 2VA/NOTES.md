@@ -46,6 +46,10 @@ Os anexos de 05 ao 11 s'ao arquivos de texto com números. Estes arquivos serão
 
 ## Norman's Notes
 
+### ah
+
+26-06-20_23-41: Used a manager = Manager() and a queue = manager.Queue() i the runParallel function
+
 ### TO-DO
 
 ### TO-DO (RELATÓRIO)
