@@ -7,6 +7,9 @@ from multiprocessing import Manager
 import os
 import sys
 import time
+import socket
+import pickle
+import threading
 
 # ====================
 # CONSTANTS
@@ -90,17 +93,168 @@ def P2(matrixA, matrixB):
 
     return matrix
 
-# ====================
 
+
+def sendJob(
+    workerID,
+    workerIP,
+    workerPort,
+    matrixPart,
+    matrixB,
+    responses
+):
+    try:
+
+        client = socket.socket(
+            socket.AF_INET,
+            socket.SOCK_STREAM
+        )
+
+        client.connect(
+            (workerIP, workerPort)
+        )
+
+        payload = {
+            "A": matrixPart,
+            "B": matrixB
+        }
+
+        client.sendall(
+            pickle.dumps(payload)
+        )
+
+        client.shutdown(
+            socket.SHUT_WR
+        )
+
+        data = b""
+
+        while True:
+
+            packet = client.recv(4096)
+
+            if not packet:
+                break
+
+            data += packet
+
+        result = pickle.loads(data)
+
+        responses[workerID] = result["rows"]
+
+        client.close()
+
+    except Exception as e:
+
+        print(
+            f"Worker {workerID} failed: {e}"
+        )
+
+
+def P5(matrixA, matrixB):
+    startTime = time.time()
+
+    # -----------------------------------
+    # List of worker machines
+    # -----------------------------------
+
+    workers = [
+        ("192.168.1.104", 5001),
+        ("192.168.1.104", 5002),
+        ("192.168.1.104", 5003)
+        #("192.168.1.107", 5002)
+    ]
+
+    workerCount = len(workers)
+
+    # -----------------------------------
+    # Split Matrix A
+    # -----------------------------------
+
+    rowsPerWorker = len(matrixA) // workerCount
+
+    matrixParts = []
+
+    for i in range(workerCount):
+
+        start = i * rowsPerWorker
+
+        if i == workerCount - 1:
+            end = len(matrixA)
+        else:
+            end = (i + 1) * rowsPerWorker
+
+        matrixParts.append(
+            matrixA[start:end]
+        )
+
+    # -----------------------------------
+    # Send jobs
+    # -----------------------------------
+
+    responses = [None] * workerCount
+
+    threads = []
+
+    for i in range(workerCount):
+
+        ip, port = workers[i]
+
+        thread = threading.Thread(
+            target=sendJob,
+            args=(
+                i,
+                ip,
+                port,
+                matrixParts[i],
+                matrixB,
+                responses
+            )
+        )
+
+        thread.start()
+
+        threads.append(thread)
+
+    # -----------------------------------
+    # Wait all workers
+    # -----------------------------------
+
+    for thread in threads:
+        thread.join()
+
+    # -----------------------------------
+    # Join results
+    # -----------------------------------
+
+    resultMatrix = []
+    for part in responses:
+        if part is not None:
+            resultMatrix.extend(part)
+    endTime = time.time()
+
+    result = {
+        "matrix": resultMatrix,
+        "startTime": startTime,
+        "endTime": endTime,
+        "processingTime": endTime - startTime
+    }
+    #print(f"DEBUG: P5 Result: {result}")
+    return result
+
+# ========================================
+# MAIN CODE
+# ========================================
 def main(variation=None, filename=None):
     inputDefaultPath = str(Path(__file__).resolve().parent) + "\\data\\input\\"
     outputDefaultPath = str(Path(__file__).resolve().parent) + "\\data\\output\\"
-
-    matrixAName = inputDefaultPath + filename
-    matrixBName = matrixAName
+    
     if filename is None:
-        matrixAName = gui.openFile(title="Selecione a Matriz A", fileTypes=[("Text Files", "*.txt")], initialPath=inputDefaultPath, ); exitIfNone(matrixA)
-        #matrixBName = gui.openFile(title="Selecione a Matriz B", fileTypes=[("Text Files", "*.txt")]); exitIfNone(matrixA)\
+        matrixAName = gui.openFile(title="Selecione a Matriz A", fileTypes=[("Text Files", "*.txt")], initialPath=inputDefaultPath, ); exitIfNone(matrixAName)
+        matrixBName = gui.openFile(title="Selecione a Matriz B", fileTypes=[("Text Files", "*.txt")]); exitIfNone(matrixBName)
+    else:
+        matrixAName = inputDefaultPath + filename
+        matrixBName = inputDefaultPath + filename
 
     matrixA = readMatrix(matrixAName)
     matrixB = readMatrix(matrixBName)
@@ -137,6 +291,10 @@ def main(variation=None, filename=None):
         if variation == "P4": workers = max(1, cores // 2)
         
         matrixResult = runParallel(matrixA, matrixB, workers)
+    elif variation == "P5":
+        matrixResult = P5(matrixA, matrixB)
+    else:
+        gui.showError(f"Variação Inválida! <{variation}>")
     # ----------
     
 
@@ -175,7 +333,9 @@ if __name__ == "__main__":
         "2048.txt"
         ]
     
-    for variation in variations[0:4]:
-        for filename in filenames[0:5]:
+    """for variation in variations[0:5]:
+        for filename in filenames[0:8]:
             main(variation=variation, filename=filename)
-    gui.showMessage("PROGRAM FINISHED")
+    gui.showMessage("PROGRAM FINISHED")"""
+    
+    main(variation=variations[0])
