@@ -114,6 +114,8 @@ def sendJob(
             (workerIP, workerPort)
         )
 
+        #client.settimeout(0)
+
         payload = {
             "A": matrixPart,
             "B": matrixB
@@ -152,17 +154,18 @@ def sendJob(
 
 
 def P5(matrixA, matrixB):
-    startTime = time.time()
-
     # -----------------------------------
     # List of worker machines
     # -----------------------------------
 
+
+    # REMEBER TO CHANGE THE IPs HERE TO THE ONE ON THE MASTER'S IP
     workers = [
         ("192.168.1.104", 5001),
         ("192.168.1.104", 5002),
         ("192.168.1.104", 5003)
-        #("192.168.1.107", 5002)
+        #("192.168.1.107", 5004),  # my laptop
+        #("192.168.1.107", 5005)   # my laptop
     ]
 
     workerCount = len(workers)
@@ -170,7 +173,7 @@ def P5(matrixA, matrixB):
     # -----------------------------------
     # Split Matrix A
     # -----------------------------------
-
+    startTime = time.time()
     rowsPerWorker = len(matrixA) // workerCount
 
     matrixParts = []
@@ -237,7 +240,8 @@ def P5(matrixA, matrixB):
         "matrix": resultMatrix,
         "startTime": startTime,
         "endTime": endTime,
-        "processingTime": endTime - startTime
+        "processingTime": endTime - startTime,
+        "remoteComputers": len(workers)
     }
     #print(f"DEBUG: P5 Result: {result}")
     return result
@@ -293,6 +297,7 @@ def main(variation=None, filename=None):
         matrixResult = runParallel(matrixA, matrixB, workers)
     elif variation == "P5":
         matrixResult = P5(matrixA, matrixB)
+        remoteComputers = matrixResult["remoteComputers"]
     else:
         gui.showError(f"Variação Inválida! <{variation}>")
     # ----------
@@ -314,7 +319,7 @@ def main(variation=None, filename=None):
         cols=getColumnLength(matrixResult["matrix"]),
         processingTime=matrixResult["processingTime"],
         matrix=matrixResult["matrix"],
-        formatted=True
+        formatted=False
     )
     print("FILE SAVED!")
 
@@ -333,9 +338,9 @@ if __name__ == "__main__":
         "2048.txt"
         ]
     
-    """for variation in variations[0:5]:
+    for variation in variations[0:4]:
         for filename in filenames[0:8]:
             main(variation=variation, filename=filename)
-    gui.showMessage("PROGRAM FINISHED")"""
+    gui.showMessage("PROGRAM FINISHED")
     
-    main(variation=variations[0])
+    #main(variation=variations[4])

@@ -1,6 +1,6 @@
 # Distributed Matrix Multiplication
 
-A Python implementation of sequential, parallel, and distributed matrix multiplication developed for the **Distributed Systems** course.
+A Python implementation of sequential, parallel, and distributed matrix multiplication developed for the **Distributed Systems (Projeto de Sistemas Distribuidos)** course.
 
 This project compares different execution strategies for matrix multiplication, ranging from a traditional single-process implementation to a distributed architecture capable of delegating computation across multiple machines.
 

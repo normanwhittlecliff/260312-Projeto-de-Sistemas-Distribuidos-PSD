@@ -134,7 +134,7 @@ def startClient():
         socket.AF_INET,
         socket.SOCK_STREAM
     )
-
+    
     server.bind((HOST, PORT))
     server.listen()
 
@@ -142,6 +142,7 @@ def startClient():
 
     while True:
         conn, addr = server.accept()
+        #server.settimeout(0)
         print(f"[CLIENT] Connection from {addr}")
         data = b""
 
@@ -169,7 +170,7 @@ def startClient():
             "rows": resultRows["matrix"]
         }
 
-        print(response)
+        #print(response)
 
         conn.sendall(
             pickle.dumps(response)
